@@ -22,7 +22,7 @@ A beginner-level Library Management System built using JSP, Java Servlets, and M
  -final String dbPass = "YOUR_DB_PASSWORD";
  -final String pass = "YOUR_16_DIGIT_APP_PASSWORD";
 
- ## Jar Files/Folders needed(include these in your ibraries folder of project)
+ ## Jar Files/Folders needed(include these in your libraries folder of project)
 1. activation.jar ,mail.jar : for sendig mails
 2. itextpdf-5.5.13.3.jar : for pdf generation
 3. cos.jar : for receiving the file
