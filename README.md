@@ -29,5 +29,7 @@ A beginner-level Library Management System built using JSP, Java Servlets, and M
 4. mysql-connector-j-9.2.0.jar,protobuf-java-3.11.4_1.jar: for connecting to database
 5. bootstrap-4.3.1-dist
 
+📂 All Servlet files are located in src/java/LibraryManagement.
+🖥️ All JSP files and uploaded PDFs are stored inside the web directory.
 Author:
 Ayush Chowdhury,MCA student
