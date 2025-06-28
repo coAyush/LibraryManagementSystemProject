@@ -43,15 +43,16 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     </head>
     <body>
-        <%ServletContext cont = request.getServletContext();
-            if (getServletContext().getAttribute("LoginDoneAdmin") == null || !getServletContext().getAttribute("LoginDoneAdmin").toString().equalsIgnoreCase("dontDisplay")) {%>
+        <%String login = (String)session.getAttribute("loginDone"); 
+          if("yes".equalsIgnoreCase(login))
+        {%>
 
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Logged in successfully</strong> 
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <%}%>
-        <%  cont.setAttribute("LoginDoneAdmin", "dontDisplay");%>
+        <% session.removeAttribute("loginDone");}%>
+       
         <div>
             <marquee scrollamount="18" behavior="scroll" direction="left" style="text-align:center; width: 100%; ">  <P class="ho" style="font-family : Arial Black">Welcome <%=session.getAttribute("USER")%></P></marquee>
         </div>

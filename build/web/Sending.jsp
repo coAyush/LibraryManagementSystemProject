@@ -52,7 +52,7 @@
         <div class="container">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">To</span>
-                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" value="chowdhuryayush7@gmail.com" name="to" readonly required>
+                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" value="ayushchowdhury719@gmail.com" name="to" readonly required>
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">From</span>
@@ -60,7 +60,7 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">Subject</span>
-                <input type="text" class="form-control" placeholder="Subject" aria-label="Recipient's username" aria-describedby="basic-addon2" name="sub" name="subject" required>
+                <input type="text" class="form-control" placeholder="Subject" aria-label="Recipient's username" aria-describedby="basic-addon2"  name="subject" required>
 
             </div>
             <div class="input-group">

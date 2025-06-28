@@ -26,9 +26,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "BrowseBooksServlet", urlPatterns = {"/BrowseBooksServlet"})
 public class BrowseBooksServlet extends HttpServlet {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -36,7 +36,8 @@ public class BrowseBooksServlet extends HttpServlet {
         List<Book> books = new ArrayList<>();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(url, username, password)) {
+            try  {
+                Connection con = DriverManager.getConnection(url, username, password);
                 String query = "SELECT * FROM Books";
                 PreparedStatement prep = con.prepareStatement(query);
                 ResultSet rs = prep.executeQuery();
@@ -61,10 +62,10 @@ public class BrowseBooksServlet extends HttpServlet {
                 }
                 rd.forward(request, response);
             } catch (SQLException e) {
-                e.printStackTrace();
+                e.printStackTrace(response.getWriter());
             }
         } catch (Exception e) {
-            response.getWriter().println("class not found");
+            e.printStackTrace(response.getWriter());
         }
     }
 }

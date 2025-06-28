@@ -29,9 +29,9 @@ public class AddExisting extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         System.out.println("AddDB servlet hit! title=" + request.getParameter("title"));
-        final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-        final String username = "root";
-        final String password = "ayush52141";
+        final String url = "your database connection url";
+        final String username = "db username";
+        final String password = "database password";
         HttpSession ses = request.getSession(false);
         List<Book> booklist = new ArrayList<>();
         String title = request.getParameter("title");

@@ -17,8 +17,8 @@
         <title>JSP Page</title>
     </head>
     <%
-        final String from = "librarysystemxyz@gmail.com";
-        final String pass = "vprtzczxtnuoazdb";
+        final String from = "management mail";
+        final String pass = "your 16  characters app password";
         HttpSession ses=request.getSession(false);
         String to=String.valueOf(ses.getAttribute("email"));
         String name=String.valueOf(ses.getAttribute("USER"));

@@ -21,9 +21,9 @@ import javax.servlet.annotation.WebListener;
 @WebListener
 public class Refresh implements ServletContextListener {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     public void contextInitialized(ServletContextEvent sce) {
         List<Book> booklist = new ArrayList<>();

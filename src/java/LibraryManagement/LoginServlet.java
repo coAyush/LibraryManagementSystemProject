@@ -16,9 +16,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -53,9 +53,9 @@ public class LoginServlet extends HttpServlet {
                     session.setAttribute("Role", role);
                     session.setAttribute("ID", id);
                     session.setAttribute("pass", dbPass);
-
+                    session.setAttribute("loginDone", "yes");
                     if ("Admin".equalsIgnoreCase(role)) {
-                        response.sendRedirect("Admin.jsp");
+                         response.sendRedirect("Admin.jsp");
                     } else if ("Student".equalsIgnoreCase(role)) {
                         response.sendRedirect("Home.jsp");
                     } else {

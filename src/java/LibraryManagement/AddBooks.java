@@ -12,14 +12,14 @@ import com.oreilly.servlet.multipart.FileRenamePolicy;
 @WebServlet("/AddBooks")
 public class AddBooks extends HttpServlet {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String path = "E:\\Servelet\\Servlet_SSSA\\LibraryManagementSystem\\web\\pdf";
+        String path = "path to be saved";
         MultipartRequest m = new MultipartRequest(request, path, 50 * 1024 * 1024, new DefaultFileRenamePolicy()); // gets <input type="file" name="pdf">
         String title = m.getParameter("title");
         String Author = m.getParameter("author");

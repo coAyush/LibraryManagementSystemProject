@@ -5,9 +5,9 @@
 <%@page session="true" %>
 
 <%
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String dbUser = "root";
-    final String dbPass = "ayush52141";
+    final String url = "your database connection url";
+    final String dbUser = "db username";
+    final String dbPass = "db password";
     Integer userId = (Integer) session.getAttribute("ID");
     String username = (String) session.getAttribute("USER");
     String email = (String) session.getAttribute("email");

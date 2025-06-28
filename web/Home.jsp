@@ -63,15 +63,15 @@
 <div class="logout">
     <a href="Logout" class="btn btn-danger">Logout</a>
 </div>
-<%ServletContext cont=request.getServletContext();
-        if(getServletContext().getAttribute("LoginDoneUser")==null||!getServletContext().getAttribute("LoginDoneUser").toString().equalsIgnoreCase("dontDisplay")){%>
+    <% String logindone=(String)session.getAttribute("loginDone");
+if(logindone!=null && "yes".equalsIgnoreCase(logindone)){%>
  <div class="alert alert-danger alert-dismissible fade show" role="alert">
   <strong>Logged in successfully</strong> 
   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
 <%}%>
-     <%   cont.setAttribute("LoginDoneUser","dontDisplay");%>;
+<%   session.removeAttribute("loginDone");%>;
     <h1 class="mb-4">Welcome to the Library Portal</h1>
     <div class="container">
     <div class="row justify-content-center">

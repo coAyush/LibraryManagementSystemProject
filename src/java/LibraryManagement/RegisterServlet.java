@@ -13,9 +13,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "RegisterServlet", urlPatterns = {"/RegisterServlet"})
 public class RegisterServlet extends HttpServlet {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,23 +27,27 @@ public class RegisterServlet extends HttpServlet {
         String role = request.getParameter("role");
         int id = 0;
         System.out.println("RegisterServlet triggered for: " + name);
-
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(3600);
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("Driver loaded successfully.");
             try (Connection con = DriverManager.getConnection(url, username, password)) {
 
                 // Check if user already exists by name only (optional)
-                String checkQuery = "SELECT * FROM USERS WHERE Name = ?";
+                String checkQuery = "SELECT * FROM USERS WHERE Name = ? AND email =?";
                 PreparedStatement checkStmt = con.prepareStatement(checkQuery);
                 checkStmt.setString(1, name);
-
+                checkStmt.setString(2, email);
                 ResultSet rs = checkStmt.executeQuery();
 
                 if (rs.next()) {
                     System.out.println("User already exists.");
                     response.setContentType("text/html");
                     PrintWriter out = response.getWriter();
+                    session.setAttribute("name", name);
+                    session.setAttribute("email", email);
+
                     out.println("<script type='text/javascript'>");
                     out.println("alert('User already registered. Please login.');");
                     out.println("location='Login.jsp';");
@@ -51,16 +55,15 @@ public class RegisterServlet extends HttpServlet {
                     return;
                 }
 
-                // Insert new user
+                PrintWriter out = response.getWriter();
                 String insertQuery = "INSERT INTO USERS(Name, password,Role,email) VALUES (?, ?, ?,?)";
-                PreparedStatement prep = con.prepareStatement(insertQuery,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement prep = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
                 prep.setString(1, name);
                 prep.setString(2, pass);
                 prep.setString(3, role);
                 prep.setString(4, email);
                 int res = prep.executeUpdate();
-                HttpSession session = request.getSession();
-                session.setMaxInactiveInterval(3600);
+
                 if (res > 0) {
                     ResultSet keys = prep.getGeneratedKeys();
                     if (keys.next()) {
@@ -72,11 +75,14 @@ public class RegisterServlet extends HttpServlet {
                     session.setAttribute("email", email);
                     session.setAttribute("ID", id);
                     session.setAttribute("role", role);
-                    response.sendRedirect("Login.jsp");
+                    out.println("<script type='text/javascript'>");
+                    out.println("alert('Registration successful. Redirecting to login page...');");
+                    out.println("window.location.href = 'Login.jsp';");
+                    out.println("</script>");
+
                 } else {
                     System.out.println("User registration failed.");
                     response.setContentType("text/html");
-                    PrintWriter out = response.getWriter();
                     out.println("<script type='text/javascript'>");
                     out.println("alert('Registration failed.');");
                     out.println("location='Register.html';");

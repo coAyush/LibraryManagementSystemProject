@@ -87,6 +87,9 @@
         <div class="card-strip">
             <%
                 List<Book> books = (List<Book>) request.getAttribute("BOOKS");
+                if(books==null){
+                    books=(List<Book>)getServletContext().getAttribute("booklist");
+                }
                 if (books != null && !books.isEmpty()) {
                     for (Book book : books) {
                         String imagePath = "Images/addbooks.png";
@@ -101,6 +104,8 @@
                             imagePath = "Images/Sevlets_Tutorial.jpeg";
                         } else if (book.getTitle().equalsIgnoreCase("Mathematical Physics")) {
                             imagePath = "Images/Mathematical Physics.jpeg";
+                        }else if (book.getTitle().equalsIgnoreCase("Spring Boot")) {
+                            imagePath = "Images/Spring Boot.jpg";
                         }
             %>
             <div class="card shadow-sm d-inline-block align-top" style="width: 220px; margin-right: 10px;">
@@ -116,7 +121,7 @@
             </div>
 
             <%  }
-            } else { %>
+            }else{ %>
             <div class="alert alert-warning text-center w-100">No books available to display.</div>
             <% }%>
         </div>

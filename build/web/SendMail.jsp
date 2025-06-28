@@ -17,8 +17,8 @@
         <title>Mail</title>
     </head>
     <body>
-        <% final String user = "librarysystemxyz@gmail.com";
-            final String pass = "vprtzczxtnuoazdb";
+        <% final String user = "management mail";
+            final String pass = "your 16  characters app password";
             String to = request.getParameter("to");
             String name = request.getParameter("from");
             String subject = request.getParameter("subject");

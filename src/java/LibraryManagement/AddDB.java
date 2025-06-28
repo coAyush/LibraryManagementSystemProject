@@ -25,9 +25,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet(name = "AddDB", urlPatterns = {"/AddDB"})
 public class AddDB extends HttpServlet {
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String username = "root";
-    final String password = "ayush52141";
+    final String url = "your database connection url";
+    final String username = "db username";
+    final String password = "database password";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

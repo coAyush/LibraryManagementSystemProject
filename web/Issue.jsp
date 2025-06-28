@@ -22,9 +22,9 @@
     PreparedStatement prep = null, userStmt = null, updateStmt = null;
     ResultSet rs = null, ru = null;
 
-    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
-    final String dbUser = "root";
-    final String dbPass = "ayush52141";
+    final String url = "your database connection url";
+    final String dbUser = "your database user name";
+    final String dbPass = "your database password";
 
     if (title != null && name != null) {
         try {
@@ -98,8 +98,8 @@
             }
 
             // Send Email
-            final String fromUser = "librarysystemxyz@gmail.com";
-            final String fromPass = "vprtzczxtnuoazdb"; // Use app password
+            final String fromUser = "management email";
+            final String fromPass = "16 characters app paasword of gmail"; // Use app password
             String subject = "Book Issue Details";
             String msg = "Dear " + name + ",\n\nYour book has been issued successfully.\nPlease check the attached receipt.\n\nThanks,\nLibrary Team";
 

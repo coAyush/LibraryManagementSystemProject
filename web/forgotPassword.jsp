@@ -81,7 +81,7 @@ boolean verified = "verified".equals(status);
 
 <% if (verified) { %>
     <form action="PasswordReset" method="post">
-        <input type="text" name="newPass" placeholder="Enter your new password" required>
+        <input type="password" name="newPass" placeholder="Enter your new password" required>
         <input type="submit" value="Submit">
         <input type="reset" value="Clear">
     </form>

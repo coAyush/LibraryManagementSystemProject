@@ -75,6 +75,8 @@
                             imagePath = "Images/Sevlets_Tutorial.jpeg";
                         } else if (book.getTitle().equalsIgnoreCase("Mathematical Physics")) {
                             imagePath = "Images/Mathematical Physics.jpeg";
+                        }else if (book.getTitle().equalsIgnoreCase("Spring Boot")) {
+                            imagePath = "Images/Spring Boot.jpg";
                         }
             %>
             <div class="col-md-3">
@@ -93,8 +95,8 @@
                 </div>
             </div>
             <%
-                }
-            } else {
+               }
+                }else{
             %>
             <div class="col-12">
                 <div class="alert alert-warning text-center">No books available to display.</div>
