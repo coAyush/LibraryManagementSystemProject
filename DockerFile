@@ -1,0 +1,26 @@
+# 1. Start with a compatible Java environment. GlassFish 4.1 works well with Java 8.
+FROM openjdk:8-jdk
+
+# 2. Set environment variables for GlassFish location and disable the first-run setup.
+ENV GLASSFISH_HOME /usr/local/glassfish4
+ENV PATH $PATH:$GLASSFISH_HOME/bin
+
+# 3. Download and install GlassFish 4.1
+# We use 'curl' to download, 'unzip' to extract, and then clean up the downloaded file.
+RUN apt-get update && apt-get install -y curl unzip && \
+    curl -L -o /tmp/glassfish-4.1.zip https://download.oracle.com/glassfish/4.1/release/glassfish-4.1.zip && \
+    unzip /tmp/glassfish-4.1.zip -d /usr/local && \
+    rm /tmp/glassfish-4.1.zip && \
+    apt-get purge -y --auto-remove curl unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# 4. Copy your .war file to the autodeploy directory of the default domain (domain1).
+# IMPORTANT: You MUST change 'dist/my-web-app.war' to the actual path and name of your .war file.
+COPY dist/LibraryManagementSystem.war $GLASSFISH_HOME/glassfish/domains/domain1/autodeploy/
+
+# 5. Expose the default HTTP port (8080) and the Admin Console port (4848).
+EXPOSE 8080
+EXPOSE 4848
+
+# 6. Set the default command to start the GlassFish server in the foreground.
+CMD ["asadmin", "start-domain", "--verbose", "domain1"]

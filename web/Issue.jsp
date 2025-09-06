@@ -22,9 +22,9 @@
     PreparedStatement prep = null, userStmt = null, updateStmt = null;
     ResultSet rs = null, ru = null;
 
-    final String url = "your database connection url";
-    final String dbUser = "your database user name";
-    final String dbPass = "your database password";
+    final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
+    final String dbUser = "root";
+    final String dbPass = "ayush52141";
 
     if (title != null && name != null) {
         try {

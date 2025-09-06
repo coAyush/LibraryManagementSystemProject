@@ -11,8 +11,8 @@
     </head>
     <body>
         <%
-            final String user = "management email";
-            final String pass = "your 16  characters app password";
+            final String user = "librarysystemxyz@gmail.com";
+            final String pass = "vprtzczxtnuoazdb";
 
             // Get email and otp from session
             String to = (String) session.getAttribute("email");
