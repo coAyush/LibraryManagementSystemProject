@@ -23,7 +23,7 @@ public class Refresh implements ServletContextListener {
 
     final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
     final String username = "root";
-    final String password = "ayush52141";
+    final String password =  System.getenv("DB_PASSWORD");
 
     public void contextInitialized(ServletContextEvent sce) {
         List<Book> booklist = new ArrayList<>();

@@ -22,7 +22,7 @@ import java.sql.*;
 public class PasswordReset extends HttpServlet {
       final String url = "jdbc:mysql://localhost:3306/Library?autoReconnect=true&useSSL=false";
     final String username = "root";
-    final String password = "ayush52141";
+    final String password =  System.getenv("DB_PASSWORD");
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

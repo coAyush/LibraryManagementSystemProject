@@ -12,7 +12,7 @@
     <body>
         <%
             final String user = "librarysystemxyz@gmail.com";
-            final String pass = "vprtzczxtnuoazdb";
+            final String pass = System.getenv("GMAIL_APP_PASS");
 
             // Get email and otp from session
             String to = (String) session.getAttribute("email");

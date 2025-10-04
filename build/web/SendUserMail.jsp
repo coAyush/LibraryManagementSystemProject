@@ -18,7 +18,7 @@
     </head>
     <%
         final String from = "librarysystemxyz@gmail.com";
-        final String pass = "vprtzczxtnuoazdb";
+        final String pass = System.getenv("GMAIL_APP_PASS");
         HttpSession ses=request.getSession(false);
         String to=String.valueOf(ses.getAttribute("email"));
         String name=String.valueOf(ses.getAttribute("USER"));

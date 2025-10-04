@@ -18,7 +18,7 @@
     </head>
     <body>
         <% final String user = "librarysystemxyz@gmail.com";
-            final String pass = "vprtzczxtnuoazdb";
+            final String pass = System.getenv("GMAIL_APP_PASS");
             String to = request.getParameter("to");
             String name = request.getParameter("from");
             String subject = request.getParameter("subject");
