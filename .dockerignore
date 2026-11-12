@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+target/
+build/
+dist/
+Dump20260124/
+nbproject/private/
+*.iml
+.idea/
+.vscode/
+
