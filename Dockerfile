@@ -12,7 +12,7 @@ COPY lib ./lib
 COPY src ./src
 COPY web ./web
 
-# Package the WAR
+# Package the webapp
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run Tomcat 9
@@ -21,11 +21,11 @@ FROM tomcat:9.0-jre11-temurin
 # Clean default Tomcat web applications
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Deploy as ROOT application (accessible at /)
-COPY --from=builder /app/target/LibraryManagementSystem.war /usr/local/tomcat/webapps/ROOT.war
+# Deploy as ROOT application (accessible directly at http://localhost:9090/)
+COPY --from=builder /app/target/LibraryManagementSystem /usr/local/tomcat/webapps/ROOT
 
-# Also keep /LibraryManagementSystem mapping for backwards-compatibility
-COPY --from=builder /app/target/LibraryManagementSystem.war /usr/local/tomcat/webapps/LibraryManagementSystem.war
+# Also deploy at /LibraryManagementSystem (accessible at http://localhost:9090/LibraryManagementSystem/)
+COPY --from=builder /app/target/LibraryManagementSystem /usr/local/tomcat/webapps/LibraryManagementSystem
 
 EXPOSE 8080
 
