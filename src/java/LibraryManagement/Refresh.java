@@ -1,59 +1,64 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package LibraryManagement;
 
-import java.util.List;
-import LibraryManagement.Book;
-import LibraryManagement.User;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-/**
- *
- * @author User
- */
 @WebListener
 public class Refresh implements ServletContextListener {
 
-    final String url = "your database connection url";
-    final String username = "db username";
-    final String password = "database password";
-
+    @Override
     public void contextInitialized(ServletContextEvent sce) {
         List<Book> booklist = new ArrayList<>();
-        List<User> Users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+
+        Connection con = null;
+        PreparedStatement prep = null;
+        PreparedStatement prep2 = null;
+        ResultSet rs = null;
+        ResultSet rd = null;
+
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try {
-                Connection con = DriverManager.getConnection(url, username, password);
-                String query = "SELECT * FROM Books";
-                PreparedStatement prep = con.prepareStatement(query);
-                ResultSet rs = prep.executeQuery();
-                while (rs.next()) {
-                    booklist.add(new Book(rs.getString("title"), rs.getString("author"), rs.getString("pdf"), rs.getInt("count")));
-                }
+            con = DBConnection.getConnection();
 
-                sce.getServletContext().setAttribute("booklist", booklist);
-                String q = "SELECT * FROM USERS WHERE Role!='Admin'";
-                PreparedStatement prep2 = con.prepareStatement(q);
-                ResultSet rd = prep2.executeQuery();
-                while (rd.next()) {
-                    Users.add(new User(rd.getInt("ID"), rd.getString("Name"), rd.getString("email"), rd.getString("password"), rd.getString("Role")));
-                }
-                sce.getServletContext().setAttribute("USERSlist", Users);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            String query = "SELECT * FROM books";
+            prep = con.prepareStatement(query);
+            rs = prep.executeQuery();
+            while (rs.next()) {
+                booklist.add(new Book(
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getString("pdf"),
+                        rs.getInt("count")
+                ));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            sce.getServletContext().setAttribute("booklist", booklist);
 
+            String q = "SELECT * FROM users WHERE Role!='Admin'";
+            prep2 = con.prepareStatement(q);
+            rd = prep2.executeQuery();
+            while (rd.next()) {
+                users.add(new User(
+                        rd.getInt("ID"),
+                        rd.getString("Name"),
+                        rd.getString("email"),
+                        rd.getString("password"),
+                        rd.getString("Role")
+                ));
+            }
+            sce.getServletContext().setAttribute("USERSlist", users);
+
+        } catch (Exception e) {
+            System.err.println("Database initialization warning in contextInitialized: " + e.getMessage());
+        } finally {
+            DBConnection.closeQuietly(rs, rd, prep, prep2, con);
+        }
     }
 
     @Override

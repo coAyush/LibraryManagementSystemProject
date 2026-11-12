@@ -1,55 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package LibraryManagement;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.sql.*;
-/**
- *
- * @author User
- */
+
 @WebServlet(name = "PasswordReset", urlPatterns = {"/PasswordReset"})
 public class PasswordReset extends HttpServlet {
-      final String url = "your database connection url";
-    final String username = "db username";
-    final String password = "database password";
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String query = "UPDATE  USERS SET password = ? WHERE Name=? AND email=?";
-         String newPass=request.getParameter("newPass");
-          HttpSession session = request.getSession();
-         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(url, username, password);
-            PreparedStatement st = con.prepareStatement(query);
-            String user= (String)session.getAttribute("USER");
-            String email= (String)session.getAttribute("email");
+
+        String query = "UPDATE users SET password = ? WHERE Name=? AND email=?";
+        String newPass = request.getParameter("newPass");
+        HttpSession session = request.getSession();
+
+        Connection con = null;
+        PreparedStatement st = null;
+
+        try {
+            con = DBConnection.getConnection();
+            st = con.prepareStatement(query);
+            String user = (String) session.getAttribute("USER");
+            String email = (String) session.getAttribute("email");
+
             st.setString(1, newPass);
-             st.setString(2, user);
+            st.setString(2, user);
             st.setString(3, email);
-            int c=st.executeUpdate();
-            if(c>0){
-               session.setAttribute("newPass", newPass);
-               response.sendRedirect("OtpVerification.jsp");
+
+            int c = st.executeUpdate();
+            if (c > 0) {
+                session.setAttribute("newPass", newPass);
+                response.sendRedirect("OtpVerification.jsp");
+            } else {
+                response.sendRedirect("forgotPassword.jsp?status=updatefailed");
             }
 
-    }catch(Exception e){
-        e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("forgotPassword.jsp?status=updatefailed");
+        } finally {
+            DBConnection.closeQuietly(st, con);
+        }
     }
-    }
-
-
-    
-
 }

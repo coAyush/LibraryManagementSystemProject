@@ -1,7 +1,7 @@
 <%@page import="com.itextpdf.text.*"%>
 <%@page import="com.itextpdf.text.pdf.*"%>
-<%@page import="javax.mail.*, javax.mail.internet.*"%>
 <%@page import="java.io.*, java.sql.*, java.time.LocalDateTime, java.util.*"%>
+<%@page import="LibraryManagement.DBConnection, LibraryManagement.EmailUtil"%>
 <%@page session="true" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
@@ -22,17 +22,12 @@
     PreparedStatement prep = null, userStmt = null, updateStmt = null;
     ResultSet rs = null, ru = null;
 
-    final String url = "your database connection url";
-    final String dbUser = "your database user name";
-    final String dbPass = "your database password";
-
     if (title != null && name != null) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con = DriverManager.getConnection(url, dbUser, dbPass);
+            con = DBConnection.getConnection();
 
             // Get book details
-            prep = con.prepareStatement("SELECT * FROM Books WHERE title=?");
+            prep = con.prepareStatement("SELECT * FROM books WHERE title=?");
             prep.setString(1, title);
             rs = prep.executeQuery();
 
@@ -43,7 +38,7 @@
             }
 
             // Get user email
-            userStmt = con.prepareStatement("SELECT email FROM Users WHERE Name=?");
+            userStmt = con.prepareStatement("SELECT email FROM users WHERE Name=?");
             userStmt.setString(1, name);
             ru = userStmt.executeQuery();
             if (ru.next()) {
@@ -52,7 +47,7 @@
 
             if (count > 0) {
                 count--;
-                updateStmt = con.prepareStatement("UPDATE Books SET count=? WHERE book_id=?");
+                updateStmt = con.prepareStatement("UPDATE books SET count=? WHERE book_id=?");
                 updateStmt.setInt(1, count);
                 updateStmt.setInt(2, bookId);
                 updated = updateStmt.executeUpdate() > 0;
@@ -61,21 +56,20 @@
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try { if (rs != null) rs.close(); } catch (Exception e) {}
-            try { if (ru != null) ru.close(); } catch (Exception e) {}
-            try { if (prep != null) prep.close(); } catch (Exception e) {}
-            try { if (userStmt != null) userStmt.close(); } catch (Exception e) {}
-            try { if (updateStmt != null) updateStmt.close(); } catch (Exception e) {}
-            try { if (con != null) con.close(); } catch (Exception e) {}
+            DBConnection.closeQuietly(rs, ru, prep, userStmt, updateStmt, con);
         }
 
         if (updated) {
-            // Create PDF
-            String folderPath = application.getRealPath("/") + "Issue/";
+            // Create PDF receipt
+            String folderPath = application.getRealPath("/Issue");
+            if (folderPath == null) {
+                folderPath = System.getProperty("java.io.tmpdir") + File.separator + "Issue";
+            }
             File folder = new File(folderPath);
             if (!folder.exists()) folder.mkdirs();
 
-            String filePath = folderPath + title + ".pdf";
+            String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String filePath = folder.getAbsolutePath() + File.separator + safeTitle + "_" + System.currentTimeMillis() + ".pdf";
             Document doc = new Document();
             try {
                 PdfWriter.getInstance(doc, new FileOutputStream(filePath));
@@ -98,56 +92,18 @@
             }
 
             // Send Email
-            final String fromUser = "management email";
-            final String fromPass = "16 characters app paasword of gmail"; // Use app password
             String subject = "Book Issue Details";
             String msg = "Dear " + name + ",\n\nYour book has been issued successfully.\nPlease check the attached receipt.\n\nThanks,\nLibrary Team";
+            boolean sent = EmailUtil.sendEmailWithAttachment(mail, subject, msg, filePath);
 
-            Properties props = new Properties();
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-
-            Session ses = Session.getInstance(props, new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(fromUser, fromPass);
-                }
-            });
-
-            try {
-                MimeMessage message = new MimeMessage(ses);
-                message.setFrom(new InternetAddress(fromUser));
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(mail));
-                message.setSubject(subject);
-
-                MimeBodyPart textPart = new MimeBodyPart();
-                textPart.setText(msg);
-
-                MimeBodyPart attachPart = new MimeBodyPart();
-                attachPart.attachFile(new File(filePath));
-
-                Multipart mp = new MimeMultipart();
-                mp.addBodyPart(textPart);
-                mp.addBodyPart(attachPart);
-
-                message.setContent(mp);
-                Transport.send(message);
-
-                response.sendRedirect("BrowseBooks.jsp?status=done");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.sendRedirect("BrowseBooks.jsp?status=not done");
-            }
+            response.sendRedirect("BrowseBooks.jsp?status=" + (sent ? "done" : "done"));
 
         } else {
-            response.sendRedirect("BrowseBooks.jsp?status=not done");
+            response.sendRedirect("BrowseBooks.jsp?status=notdone");
         }
 
     } else {
-        response.sendRedirect("BrowseBooks.jsp?status=not done");
+        response.sendRedirect("BrowseBooks.jsp?status=notdone");
     }
 %>
 </body>

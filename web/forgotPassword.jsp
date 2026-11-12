@@ -1,91 +1,86 @@
-<%-- 
-    Document   : forgotPassword
-    Created on : 23 Jun, 2025, 10:19:15 AM
-    Author     : User
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@include file="Header.jsp"%>
-<%@include file="Footer.jsp"%>
 <%@page session="true" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Password Reset</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     </head>
-    <body>
-       <%
-    String status = request.getParameter("status");
-    if (status != null) {
-        String alertClass = "info";
-        String alertMsg = "Unknown status.";
+    <body class="bg-light">
+        <div class="container mt-5" style="max-width: 500px;">
+            <div class="card shadow p-4">
+                <h3 class="text-center mb-4">Password Reset</h3>
 
-        if ("otpgenerated".equals(status)) {
-            alertClass = "primary";
-            alertMsg = "OTP has been sent to your email.";
-        } else if ("verified".equals(status)) {
-            alertClass = "success";
-            alertMsg = "OTP verified. Please enter your new password.";
-        } else if ("passwordchanged".equals(status)) {
-            alertClass = "success";
-            alertMsg = "Password updated successfully!";
-        } else if ("sendfailed".equals(status)) {
-            alertClass = "danger";
-            alertMsg = "Failed to send email. Please try again.";
-        } else if ("updatefailed".equals(status)) {
-            alertClass = "danger";
-            alertMsg = "Failed to update password. Please try again.";
-        }
-%>
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM8.93 4.58a.905.905 0 1 1-1.81 0 .905.905 0 0 1 1.81 0zM8 6.999a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/>
-    </symbol>
-    <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-    </symbol>
-    <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 0c-.535 0-1.05.21-1.414.586L.586 6.586a2 2 0 0 0 0 2.828l6 6A2 2 0 0 0 8 16a2 2 0 0 0 1.414-.586l6-6a2 2 0 0 0 0-2.828l-6-6A1.99 1.99 0 0 0 8 0zM7 4h2v4H7V4zm0 6h2v2H7v-2z"/>
-    </symbol>
-</svg>
+                <%
+                    String status = request.getParameter("status");
+                    if (status != null) {
+                        String alertClass = "info";
+                        String alertMsg = "Unknown status.";
 
-<div class="container mt-3">
-    <div class="alert alert-<%= alertClass %> alert-dismissible fade show" role="alert">
-        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
-            <use xlink:href="#<%= "danger".equals(alertClass) ? "exclamation-triangle-fill" : "check-circle-fill" %>" />
-        </svg>
-        <strong><%= alertMsg %></strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-</div>
-<%
-    }
-%>
+                        if ("otpgenerated".equals(status)) {
+                            alertClass = "primary";
+                            alertMsg = "OTP has been sent to your email.";
+                        } else if ("verified".equals(status)) {
+                            alertClass = "success";
+                            alertMsg = "OTP verified! Please enter your new password below.";
+                        } else if ("passwordchanged".equals(status)) {
+                            alertClass = "success";
+                            alertMsg = "Password updated successfully!";
+                        } else if ("sendfailed".equals(status)) {
+                            alertClass = "danger";
+                            alertMsg = "Failed to send email. Please verify email and try again.";
+                        } else if ("updatefailed".equals(status)) {
+                            alertClass = "danger";
+                            alertMsg = "Failed to update password. Please try again.";
+                        }
+                %>
+                <div class="alert alert-<%= alertClass %> alert-dismissible fade show" role="alert">
+                    <%= alertMsg %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <%  } %>
 
-        <form action="GenerateOtp" method="post">
-            <input type="email" placeholder="enter your mail" value="<%=session.getAttribute("email") != null ? session.getAttribute("email") : "" %>" required>
-            <input type="submit" value="generate Otp">
-            <input type="reset" value="clear">
-        </form>
-          <form action="VerifyOtp" method="post">
-            <input type="number" placeholder="enter  otp sent" name="verify">
-            <input type="submit" value="verify">
-            <input type="reset" value="clear">
-        </form>
-            <%
-boolean verified = "verified".equals(status);
-%>
+                <!-- Step 1: Request OTP -->
+                <form action="GenerateOtp" method="post" class="mb-4">
+                    <label class="form-label fw-bold">Step 1: Enter Your Email</label>
+                    <div class="input-group">
+                        <input type="email" name="email" class="form-control" placeholder="Enter your registered email" 
+                               value="<%=session.getAttribute("email") != null ? session.getAttribute("email") : "" %>" required>
+                        <button type="submit" class="btn btn-primary">Send OTP</button>
+                    </div>
+                </form>
 
-<% if (verified) { %>
-    <form action="PasswordReset" method="post">
-        <input type="password" name="newPass" placeholder="Enter your new password" required>
-        <input type="submit" value="Submit">
-        <input type="reset" value="Clear">
-    </form>
-<% } %>
- <button type="button" class="btn btn-warning" onclick="window.location.href = 'Login.jsp'">Back</button>
+                <!-- Step 2: Verify OTP -->
+                <form action="VerifyOtp" method="post" class="mb-4">
+                    <label class="form-label fw-bold">Step 2: Enter OTP</label>
+                    <div class="input-group">
+                        <input type="number" name="verify" class="form-control" placeholder="Enter 4-digit OTP" required>
+                        <button type="submit" class="btn btn-success">Verify</button>
+                    </div>
+                </form>
+
+                <!-- Step 3: New Password (shown only after verification) -->
+                <%
+                    boolean verified = "verified".equals(status);
+                    if (verified) {
+                %>
+                <form action="PasswordReset" method="post" class="mb-3">
+                    <label class="form-label fw-bold text-success">Step 3: Set New Password</label>
+                    <div class="mb-3">
+                        <input type="password" name="newPass" class="form-control" placeholder="Enter your new password" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold">Update Password</button>
+                </form>
+                <%  } %>
+
+                <div class="text-center mt-3">
+                    <a href="Login.jsp" class="btn btn-outline-secondary btn-sm">Back to Login</a>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

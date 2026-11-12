@@ -1,1 +1,21 @@
+# Maven build output
+/target/
+
+# NetBeans build output
+/build/
 /dist/
+nbproject/private/
+
+# Environment files
+.env
+
+# Generated receipts and uploads in development
+web/Issue/*.pdf
+!web/Issue/.gitkeep
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

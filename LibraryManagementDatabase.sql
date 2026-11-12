@@ -15,6 +15,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+CREATE DATABASE IF NOT EXISTS `library`;
+USE `library`;
+
 --
 -- Table structure for table `books`
 --
@@ -120,7 +123,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Ayush Chowdhury','database password','Admin','chowdhuryayush7@gmail.com'),(2,'Ayush','database password','student','chowdhuryayush9@gmail.com'),(3,'Pappu Kumar','pappu1234','student','chowdhuryayush9@gmail.com'),(5,'Pushpa Chowdhury','pushpa1234','student','chowdhurypushpa26@gmail.com');
+INSERT INTO `users` VALUES (1,'Ayush Chowdhury','ayush52141','Admin','chowdhuryayush7@gmail.com'),(2,'Ayush','ayush52141','student','chowdhuryayush9@gmail.com'),(3,'Pappu Kumar','pappu1234','student','chowdhuryayush9@gmail.com'),(5,'Pushpa Chowdhury','pushpa1234','student','chowdhurypushpa26@gmail.com');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

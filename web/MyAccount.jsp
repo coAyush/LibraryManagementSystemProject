@@ -2,12 +2,10 @@
 <%@page import="java.time.LocalDate"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.sql.*"%>
+<%@page import="LibraryManagement.DBConnection"%>
 <%@page session="true" %>
 
 <%
-    final String url = "your database connection url";
-    final String dbUser = "db username";
-    final String dbPass = "db password";
     Integer userId = (Integer) session.getAttribute("ID");
     String username = (String) session.getAttribute("USER");
     String email = (String) session.getAttribute("email");
@@ -48,9 +46,9 @@
             <div class="card-body">
                 <h5 class="card-title">User Details</h5>
                 <p><strong>User ID:</strong> <%= userId %></p>
-                <p><strong>Name:</strong> <%= username %></p>
-                <p><strong>Email:</strong> <%= email %></p>
-                <p><strong>Role:</strong> <%= role %></p>
+                <p><strong>Name:</strong> <%= (username != null ? username : "") %></p>
+                <p><strong>Email:</strong> <%= (email != null ? email : "") %></p>
+                <p><strong>Role:</strong> <%= (role != null ? role : "") %></p>
             </div>
         </div>
 
@@ -71,33 +69,47 @@
                     </thead>
                     <tbody>
 <%
+    Connection con = null;
+    PreparedStatement ps = null;
+    PreparedStatement psBook = null;
+    ResultSet rs = null;
+    ResultSet rsBook = null;
+
     try {
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection(url, dbUser, dbPass);
+        con = DBConnection.getConnection();
 
-        PreparedStatement ps = con.prepareStatement("SELECT * FROM ISSUE WHERE U_ID=?");
+        ps = con.prepareStatement("SELECT * FROM issue WHERE U_ID=?");
         ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
+        rs = ps.executeQuery();
 
-        PreparedStatement psBook = con.prepareStatement("SELECT title, author FROM Books WHERE book_id=?");
+        psBook = con.prepareStatement("SELECT title, author FROM books WHERE book_id=?");
 
+        boolean hasRecords = false;
         while (rs.next()) {
+            hasRecords = true;
             int bookId = rs.getInt("B_ID");
-            String issueDate = rs.getDate("Issue_Date").toString();
-            String dueDate = rs.getDate("Due_Date").toString();
-            LocalDate due = rs.getDate("Due_Date").toLocalDate();
-            LocalDate today = LocalDate.now();
-            long daysLate = ChronoUnit.DAYS.between(due, today);
+            java.sql.Date issueSqlDate = rs.getDate("Issue_Date");
+            java.sql.Date dueSqlDate = rs.getDate("Due_Date");
+            String issueDate = (issueSqlDate != null) ? issueSqlDate.toString() : "-";
+            String dueDate = (dueSqlDate != null) ? dueSqlDate.toString() : "-";
+            
+            long daysLate = 0;
+            if (dueSqlDate != null) {
+                LocalDate due = dueSqlDate.toLocalDate();
+                LocalDate today = LocalDate.now();
+                daysLate = ChronoUnit.DAYS.between(due, today);
+            }
             long fine = daysLate > 0 ? daysLate * 10 : 0;
 
             // Get Book details
             psBook.setInt(1, bookId);
-            ResultSet rsBook = psBook.executeQuery();
+            rsBook = psBook.executeQuery();
             String title = "", author = "";
             if (rsBook.next()) {
                 title = rsBook.getString("title");
                 author = rsBook.getString("author");
             }
+            rsBook.close();
 %>
                         <tr>
                             <td><%= title %></td>
@@ -109,11 +121,17 @@
                         </tr>
 <%
         }
-        con.close();
+        if (!hasRecords) {
+%>
+                        <tr><td colspan="6" class="text-center text-muted">No books currently issued.</td></tr>
+<%
+        }
     } catch (Exception e) {
 %>
-                        <tr><td colspan="6" class="text-danger">Error: <%= e.getMessage() %></td></tr>
+                        <tr><td colspan="6" class="text-danger">Error retrieving books: <%= e.getMessage() %></td></tr>
 <%
+    } finally {
+        DBConnection.closeQuietly(rs, rsBook, ps, psBook, con);
     }
 %>
                     </tbody>
