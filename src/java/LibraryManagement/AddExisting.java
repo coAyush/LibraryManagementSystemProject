@@ -1,6 +1,7 @@
 package LibraryManagement;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,59 +20,85 @@ public class AddExisting extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Book> booklist = new ArrayList<>();
-        String title = request.getParameter("title");
+        String rawTitle = request.getParameter("title");
+        String title = (rawTitle != null) ? rawTitle.trim() : "";
         String countStr = request.getParameter("count");
-        int count = (countStr != null && !countStr.trim().isEmpty()) ? Integer.parseInt(countStr.trim()) : 0;
-        int currentCount = 0;
+        int countToAdd = 1;
 
-        String q2 = "SELECT count FROM books WHERE title=?";
-        String q3 = "UPDATE books SET count=? WHERE title=?";
-        String q4 = "SELECT * FROM books";
+        try {
+            if (countStr != null && !countStr.trim().isEmpty()) {
+                countToAdd = Integer.parseInt(countStr.trim());
+            }
+        } catch (NumberFormatException ignored) {
+            countToAdd = 1;
+        }
+
+        if (title.isEmpty()) {
+            response.sendRedirect("AddExisting.jsp?Added=empty_title");
+            return;
+        }
+
+        String qFind = "SELECT book_id, title, count FROM books WHERE LOWER(TRIM(title)) = LOWER(TRIM(?))";
+        String qUpdate = "UPDATE books SET count=? WHERE book_id=?";
+        String qFetchAll = "SELECT * FROM books";
 
         Connection con = null;
-        PreparedStatement prep2 = null;
-        PreparedStatement prep3 = null;
-        PreparedStatement fetch = null;
-        ResultSet rs = null;
-        ResultSet allBooks = null;
+        PreparedStatement psFind = null;
+        PreparedStatement psUpdate = null;
+        PreparedStatement psFetchAll = null;
+        ResultSet rsFind = null;
+        ResultSet rsAll = null;
 
         try {
             con = DBConnection.getConnection();
-            prep2 = con.prepareStatement(q2);
-            prep2.setString(1, title);
-            rs = prep2.executeQuery();
-            if (rs.next()) {
-                currentCount = rs.getInt("count");
-            }
+            psFind = con.prepareStatement(qFind);
+            psFind.setString(1, title);
+            rsFind = psFind.executeQuery();
 
-            count += currentCount;
-            prep3 = con.prepareStatement(q3);
-            prep3.setInt(1, count);
-            prep3.setString(2, title);
-            int c = prep3.executeUpdate();
+            if (rsFind.next()) {
+                int bookId = rsFind.getInt("book_id");
+                String canonicalTitle = rsFind.getString("title");
+                int currentCount = rsFind.getInt("count");
+                int newTotal = currentCount + countToAdd;
 
-            if (c > 0) {
-                fetch = con.prepareStatement(q4);
-                allBooks = fetch.executeQuery();
-                while (allBooks.next()) {
-                    booklist.add(new Book(
-                            allBooks.getString("title"),
-                            allBooks.getString("author"),
-                            allBooks.getString("pdf"),
-                            allBooks.getInt("count")
-                    ));
+                psUpdate = con.prepareStatement(qUpdate);
+                psUpdate.setInt(1, newTotal);
+                psUpdate.setInt(2, bookId);
+                int updated = psUpdate.executeUpdate();
+
+                if (updated > 0) {
+                    // Refresh ServletContext booklist
+                    List<Book> booklist = new ArrayList<>();
+                    psFetchAll = con.prepareStatement(qFetchAll);
+                    rsAll = psFetchAll.executeQuery();
+                    while (rsAll.next()) {
+                        booklist.add(new Book(
+                                rsAll.getString("title"),
+                                rsAll.getString("author"),
+                                rsAll.getString("pdf"),
+                                rsAll.getInt("count")
+                        ));
+                    }
+                    getServletContext().setAttribute("booklist", booklist);
+
+                    response.sendRedirect("AddExisting.jsp?Added=success&title="
+                            + URLEncoder.encode(canonicalTitle, "UTF-8")
+                            + "&newCount=" + newTotal);
+                    return;
                 }
-                getServletContext().setAttribute("booklist", booklist);
-                response.sendRedirect("AddExisting.jsp?Added=success");
             } else {
-                response.sendRedirect("AddExisting.jsp?Added=not");
+                response.sendRedirect("AddExisting.jsp?Added=not_found&title="
+                        + URLEncoder.encode(title, "UTF-8"));
+                return;
             }
+
+            response.sendRedirect("AddExisting.jsp?Added=not");
+
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("AddExisting.jsp?Added=not");
+            response.sendRedirect("AddExisting.jsp?Added=error");
         } finally {
-            DBConnection.closeQuietly(rs, allBooks, prep2, prep3, fetch, con);
+            DBConnection.closeQuietly(rsAll, rsFind, psFetchAll, psUpdate, psFind, con);
         }
     }
 }

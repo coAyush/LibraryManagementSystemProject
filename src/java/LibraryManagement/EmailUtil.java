@@ -44,6 +44,11 @@ public class EmailUtil {
         props.put("mail.smtp.port", getMailPort());
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
+        // Strict socket timeouts to avoid blocking server threads (4 seconds max)
+        props.put("mail.smtp.connectiontimeout", "4000");
+        props.put("mail.smtp.timeout", "4000");
+        props.put("mail.smtp.writetimeout", "4000");
+
         return Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -53,8 +58,8 @@ public class EmailUtil {
     }
 
     public static boolean sendEmail(String to, String subject, String messageText) {
-        if (!isMailEnabled()) {
-            System.out.println("Email sending is disabled. Target: " + to);
+        if (!isMailEnabled() || to == null || to.trim().isEmpty()) {
+            System.out.println("Email sending skipped for: " + to);
             return true;
         }
         try {
@@ -64,7 +69,7 @@ public class EmailUtil {
 
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(user));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to.trim()));
             message.setSubject(subject);
             message.setText(messageText);
 
@@ -72,14 +77,13 @@ public class EmailUtil {
             return true;
         } catch (Exception e) {
             System.err.println("Email sending failed to " + to + ": " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
 
     public static boolean sendEmailWithAttachment(String to, String subject, String messageText, String attachmentPath) {
-        if (!isMailEnabled()) {
-            System.out.println("Email sending is disabled. Target: " + to);
+        if (!isMailEnabled() || to == null || to.trim().isEmpty()) {
+            System.out.println("Email sending skipped for: " + to);
             return true;
         }
         try {
@@ -89,7 +93,7 @@ public class EmailUtil {
 
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(user));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to.trim()));
             message.setSubject(subject);
 
             MimeBodyPart textPart = new MimeBodyPart();
@@ -114,9 +118,7 @@ public class EmailUtil {
             return true;
         } catch (Exception e) {
             System.err.println("Email with attachment sending failed to " + to + ": " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
 }
-

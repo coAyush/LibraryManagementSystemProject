@@ -18,56 +18,92 @@
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Library Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .profile-card {
+            border: none;
+            border-radius: 12px;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Library System</a>
-            <div class="ms-auto">
-                <a href="Home.jsp" class="btn btn-outline-light me-2">Home</a>
-                <a href="Logout" class="btn btn-danger">Logout</a>
+    <!-- Responsive Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="Home.jsp">📚 Library System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navContent">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-2">
+                    <a href="Home.jsp" class="btn btn-outline-light btn-sm">Home</a>
+                    <a href="BrowseBooksServlet" class="btn btn-outline-primary btn-sm">Browse Books</a>
+                    <a href="Logout" class="btn btn-outline-danger btn-sm">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Profile Section -->
-    <div class="container my-5">
-        <h2 class="mb-4 text-center">My Profile</h2>
+    <div class="container my-4" style="max-width: 900px;">
+        <h3 class="mb-4 fw-bold">Student Profile & Loans</h3>
         
-        <!-- User Info -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title">User Details</h5>
-                <p><strong>User ID:</strong> <%= userId %></p>
-                <p><strong>Name:</strong> <%= (username != null ? username : "") %></p>
-                <p><strong>Email:</strong> <%= (email != null ? email : "") %></p>
-                <p><strong>Role:</strong> <%= (role != null ? role : "") %></p>
+        <!-- User Info Card -->
+        <div class="card profile-card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold border-bottom pb-2 mb-3">User Details</h5>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <span class="text-muted small d-block">User ID</span>
+                        <span class="fw-bold">#<%= userId %></span>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <span class="text-muted small d-block">Full Name</span>
+                        <span class="fw-bold"><%= (username != null ? username : "-") %></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="text-muted small d-block">Email Address</span>
+                        <span class="fw-bold"><%= (email != null ? email : "-") %></span>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <span class="text-muted small d-block">Role</span>
+                        <span class="badge bg-primary"><%= (role != null ? role : "Student") %></span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Issued Books Table -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Issued Books</h5>
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Issue Date</th>
-                            <th>Due Date</th>
-                            <th>Days Late</th>
-                            <th>Fine (₹)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <div class="card profile-card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title fw-bold mb-0">Currently Issued Books</h5>
+                    <a href="Return.jsp" class="btn btn-outline-success btn-sm">Return a Book</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Author</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Overdue</th>
+                                <th>Fine (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 <%
     Connection con = null;
     PreparedStatement ps = null;
@@ -111,33 +147,50 @@
             }
             rsBook.close();
 %>
-                        <tr>
-                            <td><%= title %></td>
-                            <td><%= author %></td>
-                            <td><%= issueDate %></td>
-                            <td><%= dueDate %></td>
-                            <td><%= (daysLate > 0 ? daysLate : 0) %></td>
-                            <td><%= fine %></td>
-                        </tr>
+                            <tr>
+                                <td class="fw-semibold"><%= title %></td>
+                                <td class="text-muted"><%= author %></td>
+                                <td><%= issueDate %></td>
+                                <td><%= dueDate %></td>
+                                <td>
+                                    <% if (daysLate > 0) { %>
+                                        <span class="badge bg-danger"><%= daysLate %> days late</span>
+                                    <% } else { %>
+                                        <span class="badge bg-success">On time</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (fine > 0) { %>
+                                        <span class="text-danger fw-bold">₹<%= fine %></span>
+                                    <% } else { %>
+                                        <span class="text-muted">₹0</span>
+                                    <% } %>
+                                </td>
+                            </tr>
 <%
         }
         if (!hasRecords) {
 %>
-                        <tr><td colspan="6" class="text-center text-muted">No books currently issued.</td></tr>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">You have no books currently issued. <a href="BrowseBooksServlet">Browse books to issue</a>.</td>
+                            </tr>
 <%
         }
     } catch (Exception e) {
 %>
-                        <tr><td colspan="6" class="text-danger">Error retrieving books: <%= e.getMessage() %></td></tr>
+                            <tr><td colspan="6" class="text-danger">Error retrieving books: <%= e.getMessage() %></td></tr>
 <%
     } finally {
         DBConnection.closeQuietly(rs, rsBook, ps, psBook, con);
     }
 %>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -27,6 +27,9 @@ COPY --from=builder /app/target/LibraryManagementSystem /usr/local/tomcat/webapp
 # Also deploy at /LibraryManagementSystem (accessible at http://localhost:9090/LibraryManagementSystem/)
 COPY --from=builder /app/target/LibraryManagementSystem /usr/local/tomcat/webapps/LibraryManagementSystem
 
+# Ensure write permissions for file uploads (pdf) and generated receipts (Issue)
+RUN chmod -R 777 /usr/local/tomcat/webapps/
+
 EXPOSE 8080
 
 CMD ["catalina.sh", "run"]

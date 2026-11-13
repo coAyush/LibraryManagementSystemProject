@@ -1,6 +1,7 @@
 package LibraryManagement;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,50 +26,69 @@ public class Return extends HttpServlet {
         }
 
         int u_id = (Integer) ses.getAttribute("ID");
-        int b_id = 0;
-        int count = 0;
-        String title = request.getParameter("title");
+        String rawTitle = request.getParameter("title");
+        String title = (rawTitle != null) ? rawTitle.trim() : "";
 
-        String q1 = "SELECT count, book_id FROM books WHERE title=?";
-        String q2 = "DELETE FROM issue WHERE U_ID=? AND B_ID=?";
-        String q3 = "UPDATE books SET count=? WHERE title=?";
+        if (title.isEmpty()) {
+            response.sendRedirect("Return.jsp?return=empty_title");
+            return;
+        }
+
+        String qFindBook = "SELECT book_id, title, count FROM books WHERE LOWER(TRIM(title)) = LOWER(TRIM(?))";
+        String qCheckIssue = "SELECT * FROM issue WHERE U_ID=? AND B_ID=?";
+        String qDeleteIssue = "DELETE FROM issue WHERE U_ID=? AND B_ID=? LIMIT 1";
+        String qUpdateCount = "UPDATE books SET count=? WHERE book_id=?";
 
         Connection con = null;
-        PreparedStatement prep1 = null;
-        PreparedStatement prep2 = null;
-        PreparedStatement prep3 = null;
-        ResultSet rs = null;
+        PreparedStatement psFind = null;
+        PreparedStatement psCheck = null;
+        PreparedStatement psDelete = null;
+        PreparedStatement psUpdate = null;
+        ResultSet rsFind = null;
+        ResultSet rsCheck = null;
 
         try {
             con = DBConnection.getConnection();
-            prep1 = con.prepareStatement(q1);
-            prep2 = con.prepareStatement(q2);
-            prep3 = con.prepareStatement(q3);
 
-            prep1.setString(1, title);
-            rs = prep1.executeQuery();
+            // 1. Find book
+            psFind = con.prepareStatement(qFindBook);
+            psFind.setString(1, title);
+            rsFind = psFind.executeQuery();
 
-            if (rs.next()) {
-                count = rs.getInt("count") + 1;
-                b_id = rs.getInt("book_id");
+            if (!rsFind.next()) {
+                response.sendRedirect("Return.jsp?return=not_found&title=" + URLEncoder.encode(title, "UTF-8"));
+                return;
+            }
 
-                prep3.setInt(1, count);
-                prep3.setString(2, title);
-                int c1 = prep3.executeUpdate();
+            int b_id = rsFind.getInt("book_id");
+            String canonicalTitle = rsFind.getString("title");
+            int count = rsFind.getInt("count");
 
-                if (c1 > 0) {
-                    prep2.setInt(1, u_id);
-                    prep2.setInt(2, b_id);
-                    int c2 = prep2.executeUpdate();
+            // 2. Check if student actually has this book issued
+            psCheck = con.prepareStatement(qCheckIssue);
+            psCheck.setInt(1, u_id);
+            psCheck.setInt(2, b_id);
+            rsCheck = psCheck.executeQuery();
 
-                    if (c2 > 0) {
-                        response.sendRedirect("Return.jsp?return=success");
-                    } else {
-                        response.sendRedirect("Return.jsp?return=not");
-                    }
-                } else {
-                    response.sendRedirect("Return.jsp?return=not");
-                }
+            if (!rsCheck.next()) {
+                response.sendRedirect("Return.jsp?return=not_issued&title=" + URLEncoder.encode(canonicalTitle, "UTF-8"));
+                return;
+            }
+
+            // 3. Delete issue record
+            psDelete = con.prepareStatement(qDeleteIssue);
+            psDelete.setInt(1, u_id);
+            psDelete.setInt(2, b_id);
+            int deleted = psDelete.executeUpdate();
+
+            if (deleted > 0) {
+                // 4. Increment available count
+                psUpdate = con.prepareStatement(qUpdateCount);
+                psUpdate.setInt(1, count + 1);
+                psUpdate.setInt(2, b_id);
+                psUpdate.executeUpdate();
+
+                response.sendRedirect("Return.jsp?return=success&title=" + URLEncoder.encode(canonicalTitle, "UTF-8"));
             } else {
                 response.sendRedirect("Return.jsp?return=not");
             }
@@ -77,7 +97,7 @@ public class Return extends HttpServlet {
             e.printStackTrace();
             response.sendRedirect("Return.jsp?return=not");
         } finally {
-            DBConnection.closeQuietly(rs, prep1, prep2, prep3, con);
+            DBConnection.closeQuietly(rsCheck, rsFind, psDelete, psUpdate, psCheck, psFind, con);
         }
     }
 }
