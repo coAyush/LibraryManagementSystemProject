@@ -65,6 +65,16 @@
             </div>
             <%  } %>
 
+            <%
+                Integer devOtp = (Integer) session.getAttribute("otp");
+                String showDev = LibraryManagement.DBConnection.getEnvOrDefault("SHOW_DEV_OTP", "true");
+                if ("sendfailed".equals(status) && devOtp != null && !"false".equalsIgnoreCase(showDev)) {
+            %>
+            <div class="alert alert-info py-2 px-3 small mb-3 border-0 rounded-3 shadow-sm bg-info-subtle text-info-emphasis">
+                💡 <strong>Testing on Render:</strong> Render blocks outbound SMTP port 587 on free tier. Your generated OTP is: <span class="badge bg-primary fs-6 px-2 py-1"><%= devOtp %></span>. You can enter it in Step 2 below to proceed!
+            </div>
+            <%  } %>
+
             <!-- Step 1: Request OTP -->
             <form action="GenerateOtp" method="post" class="mb-3">
                 <label class="form-label fw-semibold">Step 1: Registered Email</label>

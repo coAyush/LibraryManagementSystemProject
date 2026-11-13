@@ -13,7 +13,7 @@ services:
       - DB_USER=${DB_USER:-root}
       - DB_PASSWORD=${DB_PASSWORD:-ayush52141}
       - MAIL_USERNAME=${MAIL_USERNAME:-librarysystemxyz@gmail.com}
-      - MAIL_PASSWORD=${MAIL_PASSWORD:-gwqsdlesgiwyrxvc}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-ouuqfuobuqhfwpov}
       - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
       - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_ENABLED=${MAIL_ENABLED:-true}

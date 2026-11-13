@@ -26,7 +26,7 @@ public class EmailUtil {
     }
 
     public static String getMailPass() {
-        String pass = DBConnection.getEnvOrDefault("MAIL_PASSWORD", "gwqsdlesgiwyrxvc");
+        String pass = DBConnection.getEnvOrDefault("MAIL_PASSWORD", "ouuqfuobuqhfwpov");
         return pass != null ? pass.replaceAll("\\s+", "") : "";
     }
 
@@ -83,6 +83,13 @@ public class EmailUtil {
             System.out.println("Email sending skipped for: " + to);
             return true;
         }
+
+        // 1. If RESEND_API_KEY is configured, send via HTTPS port 443 (never blocked by cloud firewalls)
+        if (DBConnection.getFirstNonEmptyEnv("RESEND_API_KEY", "RESEND_KEY") != null) {
+            return sendViaResend(to, subject, messageText);
+        }
+
+        // 2. Otherwise send via standard SMTP
         try {
             String user = getMailUser();
             String pass = getMailPass();
@@ -98,14 +105,62 @@ public class EmailUtil {
             System.out.println("Email successfully sent to: " + to);
             return true;
         } catch (Exception e) {
-            lastError = (e.getMessage() != null) ? e.getMessage() : e.getClass().getSimpleName();
-            System.err.println("Email sending failed to " + to + " via " + getMailHost() + ":" + getMailPort() + ": " + lastError);
+            String rawErr = (e.getMessage() != null) ? e.getMessage() : e.getClass().getSimpleName();
+            if (rawErr.contains("Couldn't connect to host") || rawErr.contains("timeout")) {
+                lastError = "Render blocks outbound SMTP port " + getMailPort() + " on free tier";
+            } else {
+                lastError = rawErr;
+            }
+            System.err.println(
+                    "Email sending failed to " + to + " via " + getMailHost() + ":" + getMailPort() + ": " + lastError);
             e.printStackTrace();
             return false;
         }
     }
 
-    public static boolean sendEmailWithAttachment(String to, String subject, String messageText, String attachmentPath) {
+    private static boolean sendViaResend(String to, String subject, String messageText) {
+        String apiKey = DBConnection.getFirstNonEmptyEnv("RESEND_API_KEY", "RESEND_KEY");
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            java.net.URL url = new java.net.URL("https://api.resend.com/emails");
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey.trim());
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(8000);
+            conn.setReadTimeout(8000);
+
+            String fromEmail = DBConnection.getEnvOrDefault("MAIL_FROM", "onboarding@resend.dev");
+            String safeSubject = subject.replace("\"", "\\\"");
+            String safeText = messageText.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
+            String json = "{\"from\":\"" + fromEmail + "\",\"to\":[\"" + to + "\"],\"subject\":\"" + safeSubject + "\",\"text\":\"" + safeText + "\"}";
+
+            try (java.io.OutputStream os = conn.getOutputStream()) {
+                byte[] input = json.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int code = conn.getResponseCode();
+            if (code >= 200 && code < 300) {
+                System.out.println("Email successfully sent via Resend API (HTTPS port 443) to: " + to);
+                return true;
+            } else {
+                lastError = "Resend API returned HTTP " + code;
+                System.err.println("Resend API failed: " + lastError);
+                return false;
+            }
+        } catch (Exception e) {
+            lastError = "Resend API: " + e.getMessage();
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean sendEmailWithAttachment(String to, String subject, String messageText,
+            String attachmentPath) {
         if (!isMailEnabled() || to == null || to.trim().isEmpty()) {
             System.out.println("Email sending skipped for: " + to);
             return true;

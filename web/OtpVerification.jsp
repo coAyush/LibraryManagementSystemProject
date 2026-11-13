@@ -41,7 +41,8 @@
             if (session.getAttribute("otp") != null) {
                 response.sendRedirect("forgotPassword.jsp?status=" + (sent ? "otpgenerated" : "sendfailed"));
             } else if (session.getAttribute("newPass") != null) {
-                response.sendRedirect("forgotPassword.jsp?status=" + (sent ? "passwordchanged" : "sendfailed"));
+                session.removeAttribute("newPass");
+                response.sendRedirect("forgotPassword.jsp?status=passwordchanged");
             }
         %>
     </body>
