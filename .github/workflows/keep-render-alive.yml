@@ -1,0 +1,30 @@
+
+name: Keep Render Application Alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Library Management System
+        run: |
+          URL="https://librarymanagementsystemproject-l8aw.onrender.com/"
+
+          STATUS=$(curl -L -s -o /dev/null \
+            -w "%{http_code}" \
+            --max-time 60 \
+            "$URL")
+
+          echo "Application HTTP Status: $STATUS"
+
+          if [ "$STATUS" -lt 200 ] || [ "$STATUS" -ge 400 ]; then
+            echo "Application ping failed!"
+            exit 1
+          fi
+
+          echo "Application is responding!"
