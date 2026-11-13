@@ -63,21 +63,18 @@
             <div class="card-body p-4">
                 <h5 class="card-title fw-bold border-bottom pb-2 mb-3">User Details</h5>
                 <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <span class="text-muted small d-block">User ID</span>
-                        <span class="fw-bold">#<%= userId %></span>
-                    </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <span class="text-muted small d-block">Full Name</span>
-                        <span class="fw-bold"><%= (username != null ? username : "-") %></span>
+                        <span class="fw-bold fs-6"><%= (username != null ? username : "-") %></span>
                     </div>
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-5">
                         <span class="text-muted small d-block">Email Address</span>
-                        <span class="fw-bold"><%= (email != null ? email : "-") %></span>
+                        <span class="fw-bold fs-6"><%= (email != null ? email : "-") %></span>
                     </div>
-                    <div class="col-6 col-md-2">
-                        <span class="text-muted small d-block">Role</span>
-                        <span class="badge bg-primary"><%= (role != null ? role : "Student") %></span>
+                    <div class="col-12 col-sm-12 col-md-3">
+                        <span class="text-muted small d-block">Membership Status</span>
+                        <span class="badge bg-success">Active Member</span>
+                        <span class="badge bg-primary ms-1"><%= (role != null ? role : "Student") %></span>
                     </div>
                 </div>
             </div>

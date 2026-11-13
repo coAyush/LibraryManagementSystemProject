@@ -49,6 +49,7 @@
             <div class="collapse navbar-collapse" id="navContent">
                 <div class="navbar-nav ms-auto align-items-lg-center gap-2">
                     <span class="text-light small">Welcome, <strong><%= session.getAttribute("USER") %></strong></span>
+                    <a href="index.jsp" class="btn btn-outline-light btn-sm">Home</a>
                     <a href="MyAccount.jsp" class="btn btn-outline-info btn-sm">My Account</a>
                     <a href="Logout" class="btn btn-outline-danger btn-sm">Logout</a>
                 </div>

@@ -110,8 +110,9 @@
             </div>
             <%  } %>
 
-            <div class="text-center pt-2 border-top">
-                <a href="Login.jsp" class="btn btn-outline-secondary btn-sm px-4">← Back to Login</a>
+            <div class="text-center pt-2 border-top d-flex justify-content-center gap-2">
+                <a href="Login.jsp" class="btn btn-outline-secondary btn-sm px-3">← Back to Login</a>
+                <a href="index.jsp" class="btn btn-light btn-sm px-3 border text-muted">Home</a>
             </div>
         </div>
 

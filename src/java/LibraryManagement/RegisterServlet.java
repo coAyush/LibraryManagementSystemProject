@@ -72,15 +72,19 @@ public class RegisterServlet extends HttpServlet {
                 if (keys.next()) {
                     id = keys.getInt(1);
                 }
+                session.setAttribute("USER", name);
                 session.setAttribute("name", name);
                 session.setAttribute("pass", pass);
                 session.setAttribute("email", email);
                 session.setAttribute("ID", id);
+                session.setAttribute("Role", role);
                 session.setAttribute("role", role);
+                session.setAttribute("loginDone", "yes");
 
+                String targetPage = "Admin".equalsIgnoreCase(role) ? "Admin.jsp" : "Home.jsp";
                 out.println("<script type='text/javascript'>");
-                out.println("alert('Registration successful. Redirecting to login page...');");
-                out.println("window.location.href = 'Login.jsp';");
+                out.println("alert('Registration successful! Welcome to Library Portal, " + name.replace("'", "\\'") + "');");
+                out.println("location='" + targetPage + "';");
                 out.println("</script>");
             } else {
                 out.println("<script type='text/javascript'>");

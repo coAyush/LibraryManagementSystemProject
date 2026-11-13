@@ -83,6 +83,9 @@
                 <a href="forgotPassword.jsp" class="text-decoration-none text-muted">Forgot password?</a>
                 <a href="Register.html" class="text-decoration-none fw-semibold">New Student? Register</a>
             </div>
+            <div class="text-center mt-3 pt-2">
+                <a href="index.jsp" class="text-muted small text-decoration-none">← Back to Home</a>
+            </div>
         </div>
 
         <script>

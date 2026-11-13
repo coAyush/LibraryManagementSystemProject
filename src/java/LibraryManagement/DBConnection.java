@@ -42,7 +42,7 @@ public class DBConnection {
         if (user == null) user = "root";
 
         String password = getFirstNonEmptyEnv("DB_PASSWORD", "MYSQLPASSWORD");
-        if (password == null) password = "ayush52141";
+        if (password == null) password = "";
 
         // Parse standard cloud URI (mysql://user:pass@host:port/dbname)
         if (envUrl == null && rawDatabaseUrl != null && rawDatabaseUrl.startsWith("mysql://")) {

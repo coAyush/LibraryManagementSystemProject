@@ -28,7 +28,7 @@ public class EmailUtil {
     }
 
     public static String getMailPass() {
-        String pass = DBConnection.getEnvOrDefault("MAIL_PASSWORD", "ouuqfuobuqhfwpov");
+        String pass = DBConnection.getEnvOrDefault("MAIL_PASSWORD", "");
         return pass != null ? pass.replaceAll("\\s+", "") : "";
     }
 
