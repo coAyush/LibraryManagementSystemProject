@@ -1,185 +1,375 @@
 # 📚 Library Management System
 
-A full-featured Java Web Application built with **JSP, Servlets, and MySQL**, containerized with **Docker & Docker Compose**, and managed with **Apache Maven**.
+A full-featured Java Web Application built using **Java Servlets, JSP, JDBC, and MySQL**. The application provides role-based library management workflows for administrators and students, with automated email notifications, PDF receipt generation, and containerized deployment using Docker.
+
+<p align="center">
+  <a href="https://librarymanagementsystemproject-l8aw.onrender.com/">
+    <img src="https://img.shields.io/badge/Live%20Demo-Visit%20Application-success?style=for-the-badge" alt="Live Demo"/>
+  </a>
+  <a href="https://github.com/coAyush/LibraryManagementSystemProject">
+    <img src="https://img.shields.io/badge/GitHub-Source%20Code-black?style=for-the-badge&logo=github" alt="GitHub Repository"/>
+  </a>
+</p>
+
+## 🌐 Live Demo
+
+**Live Application:** https://librarymanagementsystemproject-l8aw.onrender.com/
+
+**Source Code:** https://github.com/coAyush/LibraryManagementSystemProject
+
+The application is deployed on Render with a MySQL database hosted on TiDB Cloud.
+
+Explore the application to experience authentication workflows, role-based dashboards, book inventory management, borrowing and return operations, PDF receipt generation, and account management features.
+
+> **Note:** The application may take some time to respond to the first request if the hosting service is waking up from an idle state.
 
 ---
 
 ## 🚀 Key Features
 
-- **Authentication & Roles:** Dedicated workflows and dashboards for **Students** and **Admins**.
-- **Book Management:** Add new books with PDF uploads, manage copies of existing titles, and browse available inventory.
-- **Issuing & Receipts:** Issue books with automatic receipt generation in **PDF format** (via iText).
-- **Email Notifications:** Automated email receipts and notifications for book loans and librarian contacts (via JavaMail SMTP).
-- **Account & Fine Calculation:** Student dashboard showing active book issues, due dates, and real-time fine calculation.
-- **Password Reset:** Self-service OTP generation and email verification for resetting credentials.
-- **12-Factor Ready:** Centralized configuration via environment variables (zero hardcoded database credentials or file paths).
-- **Deployment Ready:** Multi-stage `Dockerfile` and `docker-compose.yml` with automated database seeding and health checks.
+### 🔐 Authentication & Authorization
+- Dedicated authentication workflows for Admin and Student roles.
+- Role-based dashboards and access control.
+- OTP-based email verification for password recovery.
+
+### 📖 Book Management
+- Add new books with PDF file uploads.
+- Manage inventory by adding copies of existing titles.
+- Browse available books and track inventory.
+- Maintain book availability across issuing and returning workflows.
+
+### 📋 Book Issuing & Returns
+- Issue books to registered students.
+- Generate PDF borrowing receipts using iText.
+- Process book returns and update inventory.
+- Track active book issues and due dates.
+
+### 💰 Account Management & Fine Calculation
+- Student dashboard displaying currently issued books.
+- Due-date tracking.
+- Automatic fine calculation based on overdue books.
+
+### 📧 Email Notifications
+- Automated email receipts and notifications using JavaMail SMTP.
+- Email communication for library-related activities.
+- OTP-based password recovery.
+
+### 🐳 Docker & Deployment
+- Multi-stage Dockerfile for building and deploying the application.
+- Docker Compose orchestration for the application and MySQL database.
+- Environment-based application configuration.
+- Automated database initialization and seeding.
+- Database health checks and container dependency management.
 
 ---
 
-## 🛠️ Tech Stack & Requirements
+## 🛠️ Tech Stack
 
-| Component | Technology | Version |
-| :--- | :--- | :--- |
-| **Backend** | Java Servlets & JSP (Java EE 8 / `javax.servlet`) | Java 8 / 11 / 17 / 21 |
-| **Build Tool** | Apache Maven | 3.6+ |
-| **Application Server** | Apache Tomcat | 9.x |
-| **Database** | MySQL | 8.x |
-| **Containerization** | Docker & Docker Compose | Latest |
-| **Frontend** | HTML5, Bootstrap 5, JavaScript | 5.3 |
-| **Libraries** | iText (PDF), JavaMail, COS (Oreilly) | 5.5, 1.6 |
+| Component | Technology |
+|---|---|
+| Programming Language | Java |
+| Backend | Java Servlets, JSP, JDBC |
+| Architecture | MVC |
+| Frontend | HTML5, CSS3, Bootstrap 5, JavaScript |
+| Database | MySQL / TiDB Cloud |
+| Build Tool | Apache Maven |
+| Application Server | Apache Tomcat 9 |
+| Containerization | Docker, Docker Compose |
+| PDF Generation | iText |
+| Email Integration | JavaMail SMTP |
+| File Upload | O'Reilly COS Multipart Library |
+| Version Control | Git, GitHub |
 
 ---
 
-## ⚡ Quick Start: Run with Docker Compose (Recommended)
+## 🏗️ Application Architecture
 
-The easiest way to deploy and run the entire application (Tomcat server + MySQL database) with automated database seeding:
+The application follows the **Model-View-Controller (MVC)** architectural pattern.
 
-### 1. Clone & Navigate
+- **Model:** Java classes responsible for database connectivity and business logic.
+- **View:** JSP pages responsible for rendering the user interface.
+- **Controller:** Java Servlets responsible for handling HTTP requests, processing user actions, and coordinating application workflows.
+- **Database:** MySQL stores user information, book inventory, issue records, and related application data.
+
+---
+
+## ⚡ Getting Started
+
+### Option 1: Run Using Docker Compose (Recommended)
+
+Docker Compose allows you to run the application and MySQL database together.
+
+#### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/coAyush/LibraryManagementSystemProject.git
-cd LibraryManagementSystem
+
+cd LibraryManagementSystemProject
 ```
 
-### 2. Configure Environment (Optional)
-A template `.env.example` is provided. Copy it to `.env` if you wish to customize ports or credentials:
+#### 2. Configure Environment Variables
+
+A `.env.example` file is provided as a template.
+
+Create your local environment file:
+
 ```bash
 cp .env.example .env
 ```
 
-### 3. Build & Start Containers
+Update the environment variables with your database and email configuration.
+
+**Never commit your `.env` file or actual credentials to GitHub.**
+
+#### 3. Build and Start Containers
+
 ```bash
 docker compose up --build -d
 ```
 
-### 4. Access the Application
-Open your browser and navigate to:
-- **Application URL:** [http://localhost:9090](http://localhost:9090)
-- **Direct Login:** [http://localhost:9090/Login.jsp](http://localhost:9090/Login.jsp)
+Check the running containers:
 
-### 5. Default Credentials
-The database is automatically pre-seeded with sample users and books:
-- **Admin Login:**
-  - **Username:** `Ayush Chowdhury`
-  - **Email:** `chowdhuryayush7@gmail.com`
-  - **Password:** `ayush52141`
-  - **Role:** Select `Admin`
-- **Student Login:**
-  - **Username:** `Ayush`
-  - **Email:** `chowdhuryayush9@gmail.com`
-  - **Password:** `ayush52141`
-  - **Role:** Select `Student`
+```bash
+docker compose ps
+```
+
+View application logs:
+
+```bash
+docker compose logs -f app
+```
+
+#### 4. Access the Application
+
+Once the containers are running, access:
+
+- **Application:** http://localhost:9090/
+- **Login:** http://localhost:9090/Login.jsp
+
+#### 5. Sample Login Credentials
+
+The database can be initialized with sample users and books through the provided SQL seed script.
+
+Configure your own demonstration accounts locally. Do not publish real account passwords or personal email credentials in this repository.
 
 ---
 
-## 💻 Local Development Setup (Without Docker)
+## 💻 Option 2: Local Development Setup
 
-If running directly on your host machine:
+If you prefer running the application without Docker:
 
-### 1. Prerequisites
-- **JDK 8 or higher** (`java -version`)
-- **Apache Maven 3.6+** (`mvn -version`)
-- **MySQL Server 8.0+** running on `localhost:3306`
-- **Apache Tomcat 9.x**
+### Prerequisites
 
-### 2. Database Initialization
-Log into MySQL and import the schema:
+- JDK 8 or later (subject to the project's configured Java compatibility).
+- Apache Maven 3.6+.
+- MySQL Server 8.x.
+- Apache Tomcat 9.x.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/coAyush/LibraryManagementSystemProject.git
+
+cd LibraryManagementSystemProject
+```
+
+### 2. Initialize the Database
+
+Start your MySQL server and import the provided SQL script:
+
 ```bash
 mysql -u root -p < LibraryManagementDatabase.sql
 ```
 
-### 3. Build with Maven
-Generate the WAR file:
+Configure the database connection using the environment variables described below.
+
+### 3. Build the Application
+
+Generate the deployable WAR file:
+
 ```bash
 mvn clean package
 ```
-The deployable archive will be created at `target/LibraryManagementSystem.war`.
 
-### 4. Deploy to Tomcat
-- Copy `target/LibraryManagementSystem.war` to `$CATALINA_HOME/webapps/ROOT.war`.
-- Start Tomcat:
-  ```bash
-  # Windows
-  %CATALINA_HOME%\bin\startup.bat
+The generated WAR file will be available at:
 
-  # Linux / macOS
-  $CATALINA_HOME/bin/startup.sh
-  ```
-- Open [http://localhost:8080](http://localhost:8080).
+```text
+target/LibraryManagementSystem.war
+```
+
+### 4. Deploy to Apache Tomcat
+
+Copy the generated WAR file into the Tomcat webapps directory.
+
+For a root deployment:
+
+```text
+target/LibraryManagementSystem.war
+    ↓
+$CATALINA_HOME/webapps/ROOT.war
+```
+
+Start Tomcat.
+
+**Windows:**
+
+```bash
+%CATALINA_HOME%\bin\startup.bat
+```
+
+**Linux/macOS:**
+
+```bash
+$CATALINA_HOME/bin/startup.sh
+```
+
+Access the application:
+
+```text
+http://localhost:8080/
+```
 
 ---
 
 ## ⚙️ Environment Variables
 
-The application reads configuration dynamically from environment variables:
+The application supports environment-based configuration for database connectivity and email services.
 
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `DB_HOST` | MySQL hostname | `mydb` (or `localhost`) |
-| `DB_PORT` | MySQL port | `3306` |
-| `DB_NAME` | Database schema name | `library` |
-| `DB_USER` | Database username | `root` |
-| `DB_PASSWORD` | Database password | `ayush52141` |
-| `JDBC_DATABASE_URL` | Complete JDBC URL override | *(Generated from host/port)* |
-| `MAIL_USERNAME` | SMTP sender email | `librarysystemxyz@gmail.com` |
-| `MAIL_PASSWORD` | Gmail App Password | `gwqs dles giwy rxvc` |
-| `MAIL_HOST` | SMTP server host | `smtp.gmail.com` |
-| `MAIL_PORT` | SMTP server port | `587` |
-| `MAIL_ENABLED` | Enable/Disable email sending | `true` |
+| Variable | Description |
+|---|---|
+| `DB_HOST` | MySQL database hostname |
+| `DB_PORT` | MySQL database port |
+| `DB_NAME` | Database schema name |
+| `DB_USER` | Database username |
+| `DB_PASSWORD` | Database password |
+| `JDBC_DATABASE_URL` | Optional complete JDBC connection URL override |
+| `MAIL_USERNAME` | SMTP sender email address |
+| `MAIL_PASSWORD` | SMTP app password |
+| `MAIL_HOST` | SMTP server hostname |
+| `MAIL_PORT` | SMTP server port |
+| `MAIL_ENABLED` | Enable or disable email functionality |
 
----
+### Example Configuration
 
-## ☁️ Cloud Deployment Guidelines
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=library
+DB_USER=root
+DB_PASSWORD=your_local_password
 
-This project can be deployed to any Docker-capable cloud provider:
-
-### Deploying to Render / Railway / Fly.io / AWS ECS:
-1. Connect this repository to your platform.
-2. Select **Docker** deployment (uses `Dockerfile`).
-3. Attach a managed **MySQL Database**.
-4. Set the following environment variables in your cloud dashboard:
-   - `DB_HOST`: Your cloud database host
-   - `DB_PORT`: `3306` (or your provider's port)
-   - `DB_NAME`: `library`
-   - `DB_USER`: Database user
-   - `DB_PASSWORD`: Database password
-   - `MAIL_USERNAME` & `MAIL_PASSWORD`: Your SMTP credentials
-5. Run the migration script `LibraryManagementDatabase.sql` against your cloud database once.
-
----
-
-## 📂 Project Architecture
-
+MAIL_USERNAME=your_email@example.com
+MAIL_PASSWORD=your_email_app_password
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_ENABLED=true
 ```
-LibraryManagementSystem/
-├── src/java/LibraryManagement/   # Servlets & Core Java Classes
-│   ├── DBConnection.java          # Centralized Database Connection Manager
-│   ├── EmailUtil.java             # Centralized Email Dispatcher
-│   ├── LoginServlet.java          # User Authentication
-│   ├── RegisterServlet.java       # User Registration
-│   ├── AddBooks.java              # File upload & inventory creation
-│   ├── AddExisting.java           # Inventory stock increment
-│   ├── BrowseBooksServlet.java    # Book catalog retrieval
-│   ├── AddDB.java                 # Book issuing logic
-│   ├── CreatePdf.java             # Portable PDF receipt generator
-│   ├── Return.java                # Book return processor
-│   ├── Refresh.java               # Application startup context listener
-│   └── ...
-├── web/                           # JSPs, HTML & Static Assets
+
+Use appropriate environment-specific values when running through Docker Compose or deploying to a cloud platform.
+
+---
+
+## ☁️ Cloud Deployment
+
+The application is containerized and can be deployed to Docker-compatible hosting environments.
+
+### Current Deployment
+
+| Component | Platform |
+|---|---|
+| Application Hosting | Render |
+| Database Hosting | TiDB Cloud |
+| Containerization | Docker |
+| Application Server | Apache Tomcat 9 |
+
+### Live Application
+
+https://librarymanagementsystemproject-l8aw.onrender.com/
+
+### Other Potential Deployment Platforms
+
+- Render
+- Railway
+- Fly.io
+- AWS ECS
+
+### Deployment Steps
+
+1. Connect the GitHub repository to your chosen deployment platform.
+2. Configure Docker-based deployment using the project's Dockerfile.
+3. Provision a managed MySQL-compatible database.
+4. Configure the required database and SMTP environment variables.
+5. Initialize the database using `LibraryManagementDatabase.sql` where required.
+6. Deploy the application and verify database connectivity and application functionality.
+
+**Note:** Cloud deployment requires compatible database networking, persistent file storage where needed, and appropriate environment configuration.
+
+---
+
+## 📂 Project Structure
+
+```text
+LibraryManagementSystemProject/
+│
+├── src/
+│   └── java/
+│       └── LibraryManagement/
+│           ├── DBConnection.java
+│           ├── EmailUtil.java
+│           ├── LoginServlet.java
+│           ├── RegisterServlet.java
+│           ├── AddBooks.java
+│           ├── AddExisting.java
+│           ├── BrowseBooksServlet.java
+│           ├── AddDB.java
+│           ├── CreatePdf.java
+│           ├── Return.java
+│           ├── Refresh.java
+│           └── ...
+│
+├── web/
 │   ├── WEB-INF/
-│   │   ├── web.xml                # Deployment descriptor
-│   │   └── lib/                   # Runtime libraries (cos.jar, etc.)
-│   ├── Images/                    # UI icons and book thumbnails
-│   ├── pdf/                       # Uploaded and bundled eBooks
-│   ├── Login.jsp                  # Authentication UI
-│   ├── Home.jsp                   # Student Portal
-│   ├── Admin.jsp                  # Admin Dashboard
-│   ├── BrowseBooks.jsp            # Catalog & Issue UI
-│   ├── MyAccount.jsp              # Loans, Due Dates & Fines
+│   │   ├── web.xml
+│   │   └── lib/
+│   ├── Images/
+│   ├── pdf/
+│   ├── Login.jsp
+│   ├── Home.jsp
+│   ├── Admin.jsp
+│   ├── BrowseBooks.jsp
+│   ├── MyAccount.jsp
 │   └── ...
-├── Dockerfile                     # Multi-stage production build (Tomcat 9)
-├── docker-compose.yml             # Full-stack orchestrator (App + MySQL)
-├── LibraryManagementDatabase.sql  # Automated database seed schema
-├── pom.xml                        # Apache Maven Build Descriptor
-└── README.md                      # Documentation
+│
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+├── LibraryManagementDatabase.sql
+├── pom.xml
+└── README.md
 ```
+
+---
+
+## 🔮 Future Improvements
+
+- Migrate the existing backend to Spring Boot.
+- Introduce Spring Security for centralized authentication and authorization.
+- Add automated unit and integration testing.
+- Implement Redis caching for frequently accessed catalog data.
+- Improve monitoring and application logging.
+
+---
+
+## 👨‍💻 Author
+
+**Ayush Chowdhury**
+
+- GitHub: https://github.com/coAyush
+- LinkedIn: https://linkedin.com/in/ayush-chowdhury-6a7858293
+
+---
+
+## 📄 License
+
+This project is available for educational and demonstration purposes. Add an explicit open-source license if you intend to permit reuse and redistribution.
