@@ -15,12 +15,19 @@ import javax.mail.internet.MimeMultipart;
 
 public class EmailUtil {
 
+    private static volatile String lastError = null;
+
+    public static String getLastError() {
+        return lastError;
+    }
+
     public static String getMailUser() {
         return DBConnection.getEnvOrDefault("MAIL_USERNAME", "librarysystemxyz@gmail.com");
     }
 
     public static String getMailPass() {
-        return DBConnection.getEnvOrDefault("MAIL_PASSWORD", "gwqs dles giwy rxvc");
+        String pass = DBConnection.getEnvOrDefault("MAIL_PASSWORD", "gwqsdlesgiwyrxvc");
+        return pass != null ? pass.replaceAll("\\s+", "") : "";
     }
 
     public static String getMailHost() {
@@ -37,27 +44,41 @@ public class EmailUtil {
     }
 
     private static Session createSession(final String user, final String pass) {
+        String host = getMailHost();
+        String port = getMailPort();
+
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", getMailHost());
-        props.put("mail.smtp.port", getMailPort());
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        props.put("mail.smtp.ssl.trust", "*");
 
-        // Strict socket timeouts to avoid blocking server threads (4 seconds max)
-        props.put("mail.smtp.connectiontimeout", "4000");
-        props.put("mail.smtp.timeout", "4000");
-        props.put("mail.smtp.writetimeout", "4000");
+        if ("465".equals(port)) {
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.socketFactory.port", "465");
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        } else {
+            props.put("mail.smtp.starttls.enable", "true");
+        }
+
+        // 10 second socket timeout for cloud network latency
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
+
+        final String cleanPass = pass != null ? pass.replaceAll("\\s+", "") : "";
 
         return Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, pass);
+                return new PasswordAuthentication(user, cleanPass);
             }
         });
     }
 
     public static boolean sendEmail(String to, String subject, String messageText) {
+        lastError = null;
         if (!isMailEnabled() || to == null || to.trim().isEmpty()) {
             System.out.println("Email sending skipped for: " + to);
             return true;
@@ -74,9 +95,12 @@ public class EmailUtil {
             message.setText(messageText);
 
             Transport.send(message);
+            System.out.println("Email successfully sent to: " + to);
             return true;
         } catch (Exception e) {
-            System.err.println("Email sending failed to " + to + ": " + e.getMessage());
+            lastError = (e.getMessage() != null) ? e.getMessage() : e.getClass().getSimpleName();
+            System.err.println("Email sending failed to " + to + " via " + getMailHost() + ":" + getMailPort() + ": " + lastError);
+            e.printStackTrace();
             return false;
         }
     }

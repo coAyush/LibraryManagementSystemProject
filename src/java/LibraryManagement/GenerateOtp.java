@@ -25,6 +25,7 @@ public class GenerateOtp extends HttpServlet {
         Random rand = new Random();
         int otp = 1000 + rand.nextInt(9000);
         session.setAttribute("otp", otp);
+        System.out.println("[OTP GENERATED] Email: " + email + " -> OTP: " + otp);
         response.sendRedirect("OtpVerification.jsp");
     }
 }

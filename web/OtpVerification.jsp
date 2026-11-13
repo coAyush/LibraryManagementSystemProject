@@ -32,6 +32,11 @@
             }
 
             boolean sent = EmailUtil.sendEmail(to, subject, message);
+            if (!sent) {
+                session.setAttribute("mailError", EmailUtil.getLastError());
+            } else {
+                session.removeAttribute("mailError");
+            }
 
             if (session.getAttribute("otp") != null) {
                 response.sendRedirect("forgotPassword.jsp?status=" + (sent ? "otpgenerated" : "sendfailed"));

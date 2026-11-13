@@ -52,7 +52,8 @@
                         alertMsg = "✅ Password updated successfully! Please log in.";
                     } else if ("sendfailed".equals(status)) {
                         alertClass = "warning";
-                        alertMsg = "⚠️ Could not send email OTP. Please verify email address.";
+                        String err = (String) session.getAttribute("mailError");
+                        alertMsg = "⚠️ Could not send email OTP" + (err != null && !err.trim().isEmpty() ? " (" + err + ")" : "") + ". (Note: The generated OTP is also printed in Render Server Logs if testing).";
                     } else if ("updatefailed".equals(status)) {
                         alertClass = "danger";
                         alertMsg = "❌ Failed to update password. Please try again.";
