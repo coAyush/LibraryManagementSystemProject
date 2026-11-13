@@ -73,7 +73,8 @@ public class LoginServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(response, "Server error occurred. Please try again.", "Login.jsp");
+            String errorMsg = "Login error: " + (e.getMessage() != null ? e.getMessage() : e.toString());
+            showAlert(response, errorMsg, "Login.jsp");
         } finally {
             DBConnection.closeQuietly(rs, st, con);
         }
@@ -82,8 +83,14 @@ public class LoginServlet extends HttpServlet {
     private void showAlert(HttpServletResponse response, String message, String page) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
+        String safeMsg = message == null ? "Unknown error occurred." : message
+                .replace("\\", "\\\\")
+                .replace("'", "\\'")
+                .replace("\"", "\\\"")
+                .replace("\n", " ")
+                .replace("\r", " ");
         out.println("<script type='text/javascript'>");
-        out.println("alert('" + message.replace("'", "\\'") + "');");
+        out.println("alert('" + safeMsg + "');");
         out.println("location='" + page + "';");
         out.println("</script>");
     }
