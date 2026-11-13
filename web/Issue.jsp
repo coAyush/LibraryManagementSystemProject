@@ -60,7 +60,7 @@
         }
 
         if (updated) {
-            // Create PDF receipt
+            // Create professional PDF receipt
             String folderPath = application.getRealPath("/Issue");
             if (folderPath == null) {
                 folderPath = System.getProperty("java.io.tmpdir") + File.separator + "Issue";
@@ -70,30 +70,22 @@
 
             String safeTitle = title.replaceAll("[^a-zA-Z0-9.-]", "_");
             String filePath = folder.getAbsolutePath() + File.separator + safeTitle + "_" + System.currentTimeMillis() + ".pdf";
-            Document doc = new Document();
-            try {
-                PdfWriter.getInstance(doc, new FileOutputStream(filePath));
-                doc.open();
-                doc.add(new Paragraph("Book Issued Successfully\n\n"));
-                PdfPTable table = new PdfPTable(4);
-                table.addCell("Name");
-                table.addCell("Title");
-                table.addCell("Issue Date");
-                table.addCell("Due Date");
+            String issueDateStr = java.time.LocalDate.now().toString();
+            String dueDateStr = java.time.LocalDate.now().plusDays(20).toString();
 
-                table.addCell(name);
-                table.addCell(title);
-                table.addCell(LocalDateTime.now().toLocalDate().toString());
-                table.addCell(LocalDateTime.now().plusDays(15).toLocalDate().toString());
-                doc.add(table);
-                doc.close();
+            try {
+                LibraryManagement.CreatePdf.createReceipt(filePath, name, mail, title, issueDateStr, dueDateStr);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
             // Send Email
-            String subject = "Book Issue Details";
-            String msg = "Dear " + name + ",\n\nYour book has been issued successfully.\nPlease check the attached receipt.\n\nThanks,\nLibrary Team";
+            String subject = "Book Issued: " + title + " (Receipt Attached)";
+            String msg = "Dear " + name + ",\n\nYour book '" + title + "' has been issued successfully.\n"
+                    + "Issue Date: " + issueDateStr + "\n"
+                    + "Return Due Date: " + dueDateStr + " (20 Days Loan)\n\n"
+                    + "Please find your official transaction receipt attached.\n\n"
+                    + "Best regards,\nLibrary Management Portal";
             boolean sent = EmailUtil.sendEmailWithAttachment(mail, subject, msg, filePath);
 
             response.sendRedirect("BrowseBooks.jsp?status=" + (sent ? "done" : "done"));

@@ -134,7 +134,7 @@
                         Empower Your Learning With Smart Book Management
                     </h1>
                     <p class="lead opacity-90 mb-4" style="max-width: 600px;">
-                        Explore our extensive catalog, issue titles in one click, and receive instant digital PDF receipts. Built for students, researchers, and administrators.
+                        Explore our curated catalog, issue titles in one click, and receive instant digital PDF receipts. Built for students, researchers, and administrators.
                     </p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                         <% if (isLoggedIn) { %>
@@ -170,8 +170,8 @@
                         <div class="row g-2 text-dark">
                             <div class="col-6">
                                 <div class="bg-white p-3 rounded-3 shadow-sm text-center">
-                                    <div class="fs-4 fw-bold text-primary">500+</div>
-                                    <div class="small text-muted">Books Available</div>
+                                    <div class="fs-4 fw-bold text-primary">Real-Time</div>
+                                    <div class="small text-muted">Live Inventory</div>
                                 </div>
                             </div>
                             <div class="col-6">
