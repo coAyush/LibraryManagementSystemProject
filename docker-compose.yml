@@ -13,7 +13,7 @@ services:
       - DB_USER=${DB_USER:-root}
       - DB_PASSWORD=${DB_PASSWORD:-ayush52141}
       - MAIL_USERNAME=${MAIL_USERNAME:-librarysystemxyz@gmail.com}
-      - MAIL_PASSWORD=${MAIL_PASSWORD:-gwqs dles giwy rxvc}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-gwqsdlesgiwyrxvc}
       - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
       - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_ENABLED=${MAIL_ENABLED:-true}
@@ -35,7 +35,7 @@ services:
       - db_data:/var/lib/mysql
       - ./LibraryManagementDatabase.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-ayush52141}"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-ayush52141}" ]
       interval: 5s
       timeout: 5s
       retries: 12

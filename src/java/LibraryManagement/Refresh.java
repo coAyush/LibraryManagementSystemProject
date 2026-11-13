@@ -1,14 +1,17 @@
 package LibraryManagement;
 
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 
 @WebListener
 public class Refresh implements ServletContextListener {
@@ -55,7 +58,7 @@ public class Refresh implements ServletContextListener {
             sce.getServletContext().setAttribute("USERSlist", users);
 
         } catch (Exception e) {
-            System.err.println("Database initialization warning in contextInitialized: " + e.getMessage());
+            System.err.println("Database initialization notice in contextInitialized: " + e.getMessage());
         } finally {
             DBConnection.closeQuietly(rs, rd, prep, prep2, con);
         }
@@ -63,5 +66,26 @@ public class Refresh implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        // 1. Gracefully shutdown MySQL AbandonedConnectionCleanupThread to prevent memory leaks and IllegalStateException
+        try {
+            AbandonedConnectionCleanupThread.checkedShutdown();
+        } catch (Throwable t) {
+            System.err.println("Notice on shutdown of AbandonedConnectionCleanupThread: " + t.getMessage());
+        }
+
+        // 2. Deregister all registered JDBC drivers
+        try {
+            Enumeration<Driver> drivers = DriverManager.getDrivers();
+            while (drivers.hasMoreElements()) {
+                Driver driver = drivers.nextElement();
+                try {
+                    DriverManager.deregisterDriver(driver);
+                } catch (Throwable t) {
+                    System.err.println("Notice on deregistering driver " + driver + ": " + t.getMessage());
+                }
+            }
+        } catch (Throwable t) {
+            System.err.println("Notice during driver deregistration: " + t.getMessage());
+        }
     }
 }
